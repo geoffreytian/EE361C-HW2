@@ -36,7 +36,7 @@ void* fileToArray(char file1[], int* rows, int* cols){
  return matrix;
 }
 
-float product(int row, int col, float* matrix1, float* matrix2, int rows1, int rows2, int cols1, int cols2){
+float product(int col, int row, float* matrix1, float* matrix2, int rows1, int rows2, int cols1, int cols2){
   float res1[cols1];
   float res2[rows2];
   for(int i = 0; i < cols1; i++){
@@ -48,7 +48,7 @@ float product(int row, int col, float* matrix1, float* matrix2, int rows1, int r
   float sum = 0;
   for(int i = 0; i < cols1; i++){
     sum += res1[i] * res2[i];
-    //printf("%f\n", sum);
+    //printf("sum: %f res1[%d]: %f res2[%d]: %f\n", sum, i, res1[i],i, res2[i]);
   }
   return sum;  
 }
@@ -70,15 +70,21 @@ void MatrixMult(char file1[],char file2[],int T)
   int i;
   int j;
   #pragma omp for private(sum, i, j) 
-  for(i = 0; i < cols2; i++){
-    for(j = 0; j < rows1; j++){
-      sum = product(i, j, matrix1, matrix2, rows1, rows2, cols1, cols2);
+  for(i = 0; i < rows1; i++){
+    for(j = 0; j < cols2; j++){
+      sum = product(j, i, matrix1, matrix2, rows1, rows2, cols1, cols2);
       *(result + (cols2)*i + j) = sum;
-//      printf("i: %d j: %dsum: %f, thread: %d\n",i,j, sum, omp_get_thread_num());
+      //printf("i: %d j: %d sum: %f, thread: %d\n",i,j, sum, omp_get_thread_num());
     }
   }   
 }
-//Write your code here
+  //printf("%d %d \n", rows1, cols2);
+  for(int i = 0; i < rows1; i++){
+    for(int j = 0; j < cols2; j++){
+      //printf("%f  ", *(result + (cols2)*i + j));
+    }
+   // printf("\n");
+  }
 }
 
 
@@ -90,7 +96,7 @@ void main(int argc, char *argv[])
   file2=argv[2];
   int T=atoi(argv[3]);
   MatrixMult(file1,file2,T);
-  printf("Time elapsed: %lu", (clock() - t));
+  printf("Time elapsed: %lu\n", (clock() - t));
 }
 
 
